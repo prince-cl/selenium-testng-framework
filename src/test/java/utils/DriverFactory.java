@@ -3,15 +3,29 @@ package utils;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 public class DriverFactory {
 
     private static ThreadLocal<WebDriver> driver = new ThreadLocal<>();
 
     public static void initDriver() {
+
         WebDriverManager.chromedriver().setup();
-        driver.set(new ChromeDriver());
-        getDriver().manage().window().maximize();
+
+        ChromeOptions options = new ChromeOptions();
+
+        // ✅ Required for GitHub Actions / CI
+        options.addArguments("--headless=new");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--window-size=1920,1080");
+
+        // Optional stability flags
+        options.addArguments("--disable-gpu");
+        options.addArguments("--disable-extensions");
+
+        driver.set(new ChromeDriver(options));
     }
 
     public static WebDriver getDriver() {
@@ -19,8 +33,8 @@ public class DriverFactory {
     }
 
     public static void quitDriver() {
-        if (getDriver() != null) {
-            getDriver().quit();
+        if (driver.get() != null) {
+            driver.get().quit();
             driver.remove();
         }
     }
