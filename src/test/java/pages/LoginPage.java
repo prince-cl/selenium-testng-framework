@@ -9,17 +9,23 @@ public class LoginPage extends BasePage {
     private By password = By.id("password");
     private By loginBtn = By.cssSelector("button[type='submit']");
 
-    // Dashboard element (only visible after login)
+    // Element visible only after successful login
     private By activeCasesTab = By.id("ActiveCases-tab");
 
-    public void login(String user, String pass) {
+    public HomePage login(String user, String pass) {
         WaitUtil.waitForVisible(username).sendKeys(user);
-        driver.findElement(password).sendKeys(pass);
-        driver.findElement(loginBtn).click();
+        WaitUtil.waitForVisible(password).sendKeys(pass);
+        WaitUtil.waitForClickable(loginBtn).click();
+
+        return new HomePage();
     }
 
+    // ✅ THIS METHOD FIXES YOUR ERROR
     public boolean isLoginSuccessful() {
-        return WaitUtil.waitForVisible(activeCasesTab).isDisplayed();
+        try {
+            return WaitUtil.waitForVisible(activeCasesTab).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
-
